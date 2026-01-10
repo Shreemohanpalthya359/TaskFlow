@@ -1,0 +1,13 @@
+bcrypt
+blinker
+click
+Flask
+flask-cors
+Flask-JWT-Extended
+fpdf
+itsdangerous
+Jinja2
+MarkupSafe
+PyJWT
+python-dotenv
+Werkzeug
