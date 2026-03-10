@@ -214,7 +214,7 @@ npm start
 
 ---
 
-## 🍏 Native macOS Desktop App Build
+## 💻 Native Desktop App Build (macOS & Windows)
 
 TaskFlow uses built-in scripts to compile the React application and bundle the Flask backend inside an Electron Wrapper. 
 
@@ -223,14 +223,19 @@ The `public/electron.js` entrypoint spawns a hidden Node `child_process` pointin
 **Execute the Build Pipeline:**
 ```bash
 cd frontend
-npm run electron:build
+
+# To build for macOS (.dmg and .app)
+npm run electron:build:mac
+
+# To build for Windows (.exe installer)
+npm run electron:build:win
 ```
 
 **Build Output:**
 The production-ready Application package is written to:
-`frontend/dist/mac-arm64/TaskFlow.app`
+`frontend/dist/` (inside the respective `mac-arm64`, `mac`, or `win-unpacked` folders).
 
-*(Requires `electron-builder` to be installed and run on a macOS environment. The resulting binary is architecture specific based on the machine compiling it.)*
+*(Requires `electron-builder` to be installed. NOTE: You generally must be on a Windows machine to compile the Windows `.exe`, and a Mac to compile the macOS `.app`.)*
 
 ---
 
