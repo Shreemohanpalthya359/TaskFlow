@@ -25,6 +25,35 @@
 
 TaskFlow utilizes a decoupled client-server architecture, allowing the API to be consumed by the web client, potential mobile clients, and the wrapped Electron desktop application.
 
+```mermaid
+graph TD
+    subgraph "Native macOS Desktop (Electron Window)"
+        UI["✨ React 18 UI<br/>(Framer Motion, Glassmorphism)"]
+    end
+
+    subgraph "Electron Main Process"
+        Main["app.js / node_process"]
+        Main -- Spawns --> API
+    end
+
+    subgraph "Local Python Backend"
+        API["⚙️ Flask REST API<br/>(app.py on Port 5001)"]
+        DB[("💾 SQLite Database<br/>(taskflow.db)")]
+        Auth["🔑 JWT-Extended Auth"]
+        
+        API <--> DB
+        API <--> Auth
+    end
+
+    subgraph "External Cloud Services"
+        Gemini["🧠 Google Gemini API<br/>(Task Breakdown)"]
+    end
+
+    UI -- "HTTP/JSON" --> API
+    API -- "https://generativelanguage.googleapis.com" --> Gemini
+    Main -- "Loads Web Content" --> UI
+```
+
 ### Frontend Client (React)
 - **Framework:** React 18
 - **Routing:** React Router DOM (v6)
