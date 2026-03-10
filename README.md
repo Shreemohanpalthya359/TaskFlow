@@ -8,127 +8,176 @@
   <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
   <img src="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer&logoColor=blue" alt="Framer Motion" />
   <img src="https://img.shields.io/badge/Electron-191970?style=for-the-badge&logo=Electron&logoColor=white" alt="Electron" />
+  <img src="https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI" />
 </p>
 
 ### Elevate your work. Destroy your to-do list. Let AI do the heavy lifting.
 
-*TaskFlow isn't just a to-do list; it's an elite, intelligence-driven productivity suite featuring a deep-space glassmorphism UI, a built-in AI assistant, gamification, and native macOS integration.*
+*TaskFlow is an enterprise-grade, intelligence-driven productivity suite bridging the gap between a stunning Glassmorphism UI and a robust, scalable Python backend. Packaged as a native macOS application via Electron.*
 
----
+<br/>
 
 </div>
 
-## ✨ God-Tier Features
+---
+
+## 🛠 Technical Architecture
+
+TaskFlow utilizes a decoupled client-server architecture, allowing the API to be consumed by the web client, potential mobile clients, and the wrapped Electron desktop application.
+
+### Frontend Client (React)
+- **Framework:** React 18
+- **Routing:** React Router DOM (v6)
+- **State Management:** React Context API (`AuthContext`) + Local Component State
+- **Styling:** Vanilla CSS (`index.css`) with CSS Variables implementing a custom component-based Design System (Glassmorphism).
+- **Animations:** Framer Motion (`framer-motion`) orchestrating complex layout transitions, staggered mount animations, and micro-interactions.
+- **Data Visualization:** Chart.js + `react-chartjs-2` (Pie/Bar charts) and custom DOM-based components (GitHub-style Heatmap).
+- **Desktop Packaging:** Electron (`electron`, `electron-builder`) wrapping the React build and spawning the Flask subprocess.
+
+### Backend Server (Flask)
+- **Framework:** Flask (Python 3)
+- **Database:** SQLite3 using direct DB-API connections via `extensions/db.py`.
+- **Authentication:** `flask-jwt-extended` utilizing stateless JSON Web Tokens for secure route protection.
+- **AI Integration:** Google Gemini REST API via built-in `urllib.request` (zero heavy external AI dependencies).
+- **Export Engine:** `fpdf` for programmatic PDF generation.
+- **CORS:** Pluggable cross-origin resource sharing enabled for isolated frontend development.
+
+---
+
+## 💾 Database Schema (SQLite)
+
+The relational database is architected to eliminate data redundancy and ensure cascading referential integrity.
+
+- **`users`**: `id` (PK), `username`, `email` (UNIQUE), `password_hash`, `points`, `level`, `avatar` (BLOB), `streak`, `last_completed_date`.
+- **`todos`**: `id` (PK), `user_id` (FK), `title`, `description`, `status`, `priority`, `category`, `due_date`, `completed`, `is_recurring`, `recur_interval`, `is_focus`, `total_time_secs`.
+- **`subtasks`**: `id` (PK), `todo_id` (FK), `title`, `completed`.
+- **`comments`**: `id` (PK), `todo_id` (FK), `user_id` (FK), `text`.
+- **`badges`**: `id` (PK), `user_id` (FK), `badge_key` (UNIQUE constraints).
+- **`time_logs`**: `id` (PK), `todo_id` (FK), `started_at`, `stopped_at`, `duration_secs`.
+- **`tags` / `todo_tags`**: Many-to-many relationship mapping custom tags to distinct tasks.
+
+---
+
+## 🔌 API Endpoints
+All protected routes require an `Authorization: Bearer <token>` header.
+
+### Authentication (`/auth`)
+- `POST /auth/register` - Create user
+- `POST /auth/login` - Authenticate & retrieve JWT
+- `PUT /auth/profile` - Update user avatar (Base64)
+- `GET /auth/profile` - Retrieve user details
+
+### Tasks (`/todos`)
+- `GET /todos/all` - Fetch all tasks for authenticated user
+- `POST /todos/` - Create new task
+- `PUT /todos/<id>` - Update task state (and compute XP/Level progression)
+- `DELETE /todos/<id>` - Remove task
+- `GET /todos/stats` - Aggregated analytics (Total, Completed, Karma, Level, By Status/Priority/Category)
+
+### Task Modules (`/todos`)
+- **Subtasks**: `POST /todos/<id>/subtasks`, `PUT /todos/subtasks/<id>/toggle`, `DELETE /todos/subtasks/<id>`
+- **AI Integration**: `POST /todos/ai-breakdown` (Payload: `{ "goal": "..." }`)
+- **PDF Export**: `POST /todos/export` (Returns `application/pdf` blob)
+- **Comments**: `GET|POST /todos/<id>/comments`, `DELETE /comments/<id>`
+- **Time Tracker**: `POST /todos/<id>/timer/start`, `POST /todos/<id>/timer/stop`
+- **Focus Mode**: `PUT /todos/<id>/focus` (Toggles daily focus pin)
+
+### Global Modules (`/`)
+- **Tags**: `GET|POST /tags`, `DELETE /tags/<id>`, `POST|DELETE /todos/<id>/tags`
+- **Analytics**: `GET /streak`, `GET /heatmap`, `GET /todos/overdue`
+
+---
+
+## ✨ God-Tier UX Features
 
 <table>
   <tr>
     <td width="50%">
       <h3>🧠 AI-Powered Task Breakdown</h3>
-      <p>Stuck on a big goal? Click the brain icon and let the <b>Gemini AI</b> instantly break it down into actionable subtasks. Add them to your list with one click.</p>
+      <p>Click the brain icon on any task. The backend proxies a prompt to <b>Gemini AI</b> to instantly generate 4-6 actionable subtasks. Features an algorithmic fallback array if API limits are reached without crashing the client.</p>
     </td>
     <td width="50%">
-      <h3>🏆 Karma & Gamification</h3>
-      <p>Level up your productivity. Earn <b>Karma XP</b> for every completed task, track your <b>Daily Streak 🔥</b>, and unlock exclusive <b>Achievement Badges 🎖️</b>.</p>
+      <h3>🏆 Karma & Gamification Engine</h3>
+      <p>Backend middleware calculates <b>Karma XP</b> on task completion. Leveling up or hitting milestones dynamically injects <b>Achievement Badges</b> into the API response to trigger frontend Framer Motion toast notifications.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <h3>🌌 3 Dynamic Views</h3>
-      <p>Switch seamlessly between a traditional <b>List</b>, a drag-and-drop <b>Kanban Board</b>, or a 7-day <b>Weekly Calendar</b> to visualize your workload.</p>
+      <h3>🌌 Tri-Modal Data Visualization</h3>
+      <p>State mapped iteratively allowing seamless O(1) toggling between a <b>List</b>, a synchronized drag-and-drop <b>Kanban Board</b>, and a deterministic 7-day <b>Weekly Calendar</b>.</p>
     </td>
     <td width="50%">
       <h3>🧘 Immersive Zen Mode</h3>
-      <p>Block out distractions with an ambient, full-screen <b>Pomodoro timer</b>. Features immersive 3D floating orbs and customizable work/break intervals.</p>
+      <p>Full-screen dimensional overlay combining a state-driven <b>Pomodoro timer</b> (Work/Short Break/Long Break) with randomized SVG particle generation for ambient, non-distracting focus.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
       <h3>⌨️ Command Palette (⌘K)</h3>
-      <p>Never take your hands off the keyboard. Press <code>Ctrl+K</code> or <code>Cmd+K</code> anywhere to instantly create tasks, switch views, or navigate the app.</p>
+      <p>A globally scoped <code>keydown</code> listener triggering a high `z-index` omnibar. Enables instantaneous task creation and localized React Router navigation without mouse interaction.</p>
     </td>
     <td width="50%">
       <h3>🎙 Voice Intelligence</h3>
-      <p>Hands full? Click the mic and simply speak your tasks into existence using the built-in <b>Web Speech API</b> integration.</p>
+      <p>Integrates the native browser <b>Web Speech API</b>. Emits transcribed strings directly into the controlled component state of the Quick Add Task input.</p>
     </td>
   </tr>
 </table>
 
 ---
 
-## 🛠 Inside the Task Card
+## 🚀 Environment Setup
 
-Every task in TaskFlow is a powerhouse of its own:
-
-- **Subtasks & Checklists:** Infinite nesting with live-updating progress bars.
-- **⏱ Time Tracker:** Built-in stopwatch. Hit play to log exactly how many seconds you spend on a task.
-- **📌 Daily Focus:** Pin up to 3 tasks as your "Today's Focus" so they float to the top of your dashboard.
-- **💬 Comments:** Keep an activity log or add quick notes directly inside the task.
-- **⚠️ Overdue Alerts:** Never drop the ball. Overdue tasks trigger a red dashboard warning.
-
----
-
-## 📊 Analytics & Insights
-
-<div align="center">
-  <i>Your brand new "Reports" dashboard gives you the ultimate bird's-eye view.</i>
-</div>
-
-- **🗓 GitHub-Style Heatmap:** A 52-week contribution grid that gets greener the more productive you are.
-- **🔥 Streak Tracker:** See how many consecutive days you've crushed at least one task.
-- **📈 Graphical Breakdowns:** Beautiful Chart.js visualizations of your tasks by Status, Priority, and Category.
-- **📄 PDF Export:** Instantly generate and download a professional PDF report of your accomplishments.
-
----
-
-## 🎨 Design System: Deep Space Glassmorphism
-
-TaskFlow ditches boring flat design for an ultra-premium visual experience:
-- **Translucent panels** with live background blurring (`backdrop-filter: blur(24px)`).
-- **Fluid Micro-animations** on every hover and click powered by `framer-motion`.
-- **Dynamic ambient orbs** that float seamlessly behind your workspace.
-- **Customized priority badging** with neon glows.
-
----
-
-## 🚀 Getting Started
-
-TaskFlow is built on a **React** frontend and a **Flask (Python)** backend. 
-
-### 1. Run the Backend (API)
+### 1. Backend Initialization (Python 3.9+)
 ```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
+
+**Environment Variables:**
+Create a `.env` file in the `backend/` directory:
+```env
+JWT_SECRET_KEY=your_secure_random_string
+GEMINI_API_KEY=your_google_ai_studio_api_key
+```
+
+**Start the Server:**
+```bash
 python app.py
 ```
-*The backend will run on `http://127.0.0.1:5001`.*
+*Runs on `http://127.0.0.1:5001`. The script auto-initializes the SQLite database.*
 
-### 2. Run the Frontend (React)
+### 2. Frontend Initialization (Node.js 18+)
 ```bash
 cd frontend
 npm install
 npm start
 ```
-*The web app will run on `http://localhost:3000`.*
+*Runs on `http://localhost:3000`.*
 
 ---
 
-## 🍏 Native macOS Desktop App
+## 🍏 Native macOS Desktop App Build
 
-TaskFlow isn't just a website. It's packaged as a native macOS application using **Electron**. 
+TaskFlow uses built-in scripts to compile the React application and bundle the Flask backend inside an Electron Wrapper. 
 
-When running the Electron `.app`, it acts as a standalone wrapper that automatically boots the Flask backend in a hidden child process and serves the React UI in a gorgeous, chromeless native window.
+The `public/electron.js` entrypoint spawns a hidden Node `child_process` pointing to the Python venv executable, ensuring the API runs entirely locally within the desktop application context.
 
-**To build the Mac app yourself:**
+**Execute the Build Pipeline:**
 ```bash
 cd frontend
 npm run electron:build
 ```
-*Your native app will be generated at: `frontend/dist/mac-arm64/TaskFlow.app`*
+
+**Build Output:**
+The production-ready Application package is written to:
+`frontend/dist/mac-arm64/TaskFlow.app`
+
+*(Requires `electron-builder` to be installed and run on a macOS environment. The resulting binary is architecture specific based on the machine compiling it.)*
 
 ---
 
 <div align="center">
-  <p><b>Built with ❤️ for maximum focus and uncompromised aesthetics.</b></p>
+  <p><b>TaskFlow — Architected for extreme performance, security, and aesthetics.</b></p>
 </div>
