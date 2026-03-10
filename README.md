@@ -17,6 +17,10 @@
 
 <br/>
 
+<a href="#">
+  <img src="docs/screenshots/dashboard.png" alt="TaskFlow Dashboard" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);"/>
+</a>
+
 </div>
 
 ---
@@ -151,6 +155,29 @@ All protected routes require an `Authorization: Bearer <token>` header.
     </td>
   </tr>
 </table>
+
+---
+
+## 📸 App Showcase
+
+### Seamless Task Management & AI Breakdown
+<img src="docs/screenshots/ai-breakdown.png" alt="AI Task Breakdown" width="100%" style="border-radius: 12px;"/>
+
+### Your Productivity Report & Built-In Analytics
+<img src="docs/screenshots/analytics.png" alt="Analytics Dashboard" width="100%" style="border-radius: 12px;"/>
+
+### Gamification & User Profiles
+<img src="docs/screenshots/profile.png" alt="User Profile" width="100%" style="border-radius: 12px;"/>
+
+### 1-Click PDF Exports
+<img src="docs/screenshots/export.png" alt="Export Panel" width="100%" style="border-radius: 12px;"/>
+
+### Aesthetic Authentication
+<p align="center">
+  <img src="docs/screenshots/login.png" alt="Login Page" width="48%" style="border-radius: 12px;"/>
+  &nbsp;
+  <img src="docs/screenshots/signup.png" alt="Signup Page" width="48%" style="border-radius: 12px;"/>
+</p>
 
 ---
 
