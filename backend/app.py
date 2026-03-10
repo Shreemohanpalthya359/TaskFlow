@@ -4,7 +4,7 @@ from extensions.db import init_db, close_db
 from extensions.cors import enable_cors
 from routes.auth_routes import auth_bp
 from routes.todo_routes import todo_bp
-from routes.customer_routes import customer_bp
+from routes.extra_routes import extra_bp
 from config import Config
 
 def create_app():
@@ -21,7 +21,7 @@ def create_app():
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(todo_bp)
-    app.register_blueprint(customer_bp)
+    app.register_blueprint(extra_bp)
 
     @app.route('/')
     def home():
@@ -32,4 +32,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5001)
