@@ -192,10 +192,10 @@ pip install -r requirements.txt
 ```
 
 **Environment Variables:**
-Create a `.env` file in the `backend/` directory:
+Create a `.env` file in the `backend/` directory. This is **required** for authentication.
 ```env
 JWT_SECRET_KEY=your_secure_random_string
-GEMINI_API_KEY=your_google_ai_studio_api_key
+GEMINI_API_KEY=your_google_ai_studio_api_key  # Optional for AI breakdown
 ```
 
 **Start the Server:**
@@ -204,13 +204,16 @@ python app.py
 ```
 *Runs on `http://127.0.0.1:5001`. The script auto-initializes the SQLite database.*
 
-### 2. Frontend Initialization (Node.js 18+)
+### 2. Frontend Initialization (Node.js 20+)
 ```bash
 cd frontend
 npm install
 npm start
 ```
 *Runs on `http://localhost:3000`.*
+
+> [!IMPORTANT]
+> Ensure `frontend/public/index.html` and `frontend/public/manifest.json` exist. If missing, they must be recreated for the React development server to start correctly.
 
 ---
 
